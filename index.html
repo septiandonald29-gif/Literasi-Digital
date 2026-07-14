@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium 3.0 - MPLS Literasi Digital SMP (Edisi Rinci & Interaktif)</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Safe Tailwind Config (Pre-initialized to avoid race conditions in sandboxes) -->
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        display: ['Comfortaa', 'cursive'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'float': 'float 4s ease-in-out infinite',
+                        'float-delayed': 'float 4s ease-in-out infinite 2s',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 15s linear infinite',
+                        'wiggle': 'wiggle 0.5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' },
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+
+    <!-- Tailwind CSS Play CDN Script -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Canvas Confetti & Tone JS -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+        }
+
+        .slide-transition {
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Custom scrollbar untuk navigasi */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Presenter Laser Pointer Mode */
+        .laser-active {
+            cursor: none !important;
+        }
+        #laser-dot {
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, rgba(255,30,30,1) 0%, rgba(255,0,0,0.6) 40%, rgba(255,0,0,0) 100%);
+            box-shadow: 0 0 15px 6px rgba(255,0,0,0.9);
+            border-radius: 50%;
+            position: absolute;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+        }
+
+        /* Glassmorphism utilities */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .dark-glass-card {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-800 font-sans min-h-screen overflow-hidden flex flex-col select-none">
+
+    <!-- Laser Dot element -->
+    <div id="laser-dot"></div>
+
+    <header class="h-16 bg-slate-950/95 border-b border-slate-800 px-6 flex items-center justify-between z-40 shrink-0">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white transition p-2 hover:bg-slate-800 rounded-lg animate-pulse" title="Buka Navigasi Slide (S)">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <div class="hidden sm:flex flex-col">
+                <span class="text-xs text-indigo-400 font-bold tracking-wider uppercase">MPLS SMP INTERAKTIF 2026</span>
+                <span class="text-sm text-white font-semibold font-display">Zona Jelajah Literasi Digital Premium 3.0</span>
+            </div>
+        </div>
+
+        <!-- Timer & Interactive Indicators -->
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 px-3.5 py-1.5 rounded-full text-slate-300 text-xs">
+                <i class="fa-solid fa-hourglass-half text-amber-400 animate-spin-slow"></i>
+                <span id="timer-display" class="font-mono font-bold">00:00</span>
+                <button onclick="resetTimer()" class="text-slate-500 hover:text-white transition ml-1" title="Reset Timer">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </button>
+            </div>
+
+            <!-- Presenter Actions -->
+            <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-800 p-1 rounded-lg">
+                <button id="btn-laser" onclick="toggleLaser()" class="p-1.5 text-slate-400 hover:text-rose-500 rounded-md transition" title="Laser Pointer (L)">
+                    <i class="fa-solid fa-arrow-pointer"></i>
+                </button>
+                <button onclick="triggerConfetti()" class="p-1.5 text-slate-400 hover:text-yellow-400 rounded-md transition" title="Efek Confetti (C)">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </button>
+                <button onclick="togglePlayPause()" id="btn-play" class="p-1.5 text-slate-400 hover:text-emerald-400 rounded-md transition" title="Mute Suara Transisi">
+                    <i class="fa-solid fa-volume-high text-emerald-400"></i>
+                </button>
+                <button onclick="toggleFullscreen()" class="p-1.5 text-slate-400 hover:text-cyan-400 rounded-md transition" title="Layar Penuh (F)">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- PROGRESS BAR -->
+    <div class="w-full h-1.5 bg-slate-900 z-40 relative shrink-0">
+        <div id="progress-indicator" class="h-full bg-gradient-to-r from-emerald-400 via-pink-500 via-amber-400 to-indigo-500 transition-all duration-300" style="width: 4%"></div>
+    </div>
+
+    <!-- SIDEBAR DRAWER (Slide Index / Thumbnails) -->
+    <aside id="sidebar-drawer" class="fixed left-0 top-16 bottom-0 w-80 bg-slate-950/98 border-r border-slate-800 z-30 transition-transform -translate-x-full duration-300 overflow-y-auto flex flex-col p-4">
+        <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-800">
+            <h3 class="text-indigo-300 font-bold font-display text-sm tracking-wide">Peta Ekspedisi Materi</h3>
+            <button onclick="toggleSidebar()" class="text-slate-500 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        <div id="sidebar-slide-list" class="flex flex-col gap-1.5 flex-grow overflow-y-auto pr-1">
+            <!-- Dynamic Inject Slide Thumbnails -->
+        </div>
+    </aside>
+
+    <!-- MAIN VIEWPORT CONTAINER FOR SLIDES -->
+    <main class="flex-grow relative overflow-hidden bg-gradient-to-tr from-slate-950 via-slate-900 to-indigo-950 flex items-center justify-center p-4">
+        
+        <!-- Background Animated Particles Decor -->
+        <div class="absolute inset-0 pointer-events-none opacity-20">
+            <div class="absolute w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] -top-20 -left-20 animate-pulse-slow"></div>
+            <div class="absolute w-[600px] h-[600px] bg-pink-500/10 rounded-full blur-[140px] -bottom-30 -right-20 animate-pulse-slow"></div>
+            <div class="absolute top-[30%] left-[80%] w-4 h-4 bg-cyan-500 rounded-full animate-float"></div>
+            <div class="absolute top-[60%] left-[20%] w-6 h-6 bg-pink-400 rounded-full animate-float-delayed"></div>
+        </div>
+
+        <!-- SLIDES WRAPPER FRAME (Keeps aspect-ratio clean and professional) -->
+        <div class="w-full max-w-6xl aspect-[16/10] sm:aspect-[16/9] relative scale-100 transition-all duration-500 flex items-center justify-center">
+
+            <!-- SLIDE 1: COVER SLIDE -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 shadow-2xl border border-white/20 overflow-hidden text-white" data-slide-index="1">
+                <div class="absolute -right-16 -top-16 w-80 h-80 bg-cyan-400/30 rounded-full blur-3xl animate-pulse-slow"></div>
+                
+                <div class="flex justify-between items-center z-10">
+                    <span class="bg-white/20 text-white px-4 py-1.5 rounded-full font-bold text-xs tracking-wider uppercase font-display">
+                        🚀 MPLS SMP 2026
+                    </span>
+                    <i class="fa-solid fa-rocket text-3xl text-amber-300 animate-wiggle"></i>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center z-10 flex-grow my-auto">
+                    <div class="md:col-span-7 space-y-6 text-left">
+                        <h1 class="text-4xl sm:text-6xl font-black font-display text-white leading-tight">
+                            Ekspedisi Hebat<br><span class="text-amber-300 underline decoration-pink-400 decoration-wavy">Dunia Digital!</span>
+                        </h1>
+                        <p class="text-md sm:text-lg text-slate-100/90 font-medium max-w-lg leading-relaxed">
+                            Ayo bergabung menjadi Generasi Cerdas, Beradab, Aman, dan Hebat di Internet dalam Petualangan Literasi Digital SMP 2026.
+                        </p>
+                    </div>
+                    
+                    <div class="md:col-span-5 flex justify-center">
+                        <!-- Mockup Smartphone 3D Render style -->
+                        <div class="relative w-64 h-[350px] bg-slate-900 rounded-[2.5rem] p-3 shadow-2xl border-4 border-slate-700 animate-float">
+                            <div class="h-full w-full bg-slate-950 rounded-[2rem] overflow-hidden p-3 relative flex flex-col justify-between text-white border border-slate-800">
+                                <div class="flex items-center justify-between text-[9px] text-slate-500">
+                                    <span>SMP digital</span>
+                                    <div class="flex items-center gap-1">
+                                        <i class="fa-solid fa-wifi"></i>
+                                        <i class="fa-solid fa-battery-full"></i>
+                                    </div>
+                                </div>
+                                <div class="my-auto space-y-3 text-center">
+                                    <div class="w-14 h-14 mx-auto bg-gradient-to-tr from-amber-400 to-rose-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg">
+                                        🛸
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-sm text-amber-300">Netizen Hebat 3.0</h4>
+                                        <p class="text-[9px] text-slate-400">SMP Indonesia Maju</p>
+                                    </div>
+                                    <div class="bg-white/10 p-2 rounded-xl text-[10px] text-slate-200">
+                                        "Siap bertualang di lautan informasi!"
+                                    </div>
+                                </div>
+                                <div class="h-1 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center text-[11px] text-slate-200/80 z-10 pt-3 border-t border-white/10">
+                    <span>Oleh: Panitia MPLS & Tim Guru Pembimbing</span>
+                    <span>Tekan Tombol Panah Arah Keyboard Untuk Navigasi</span>
+                </div>
+            </div>
+
+            <!-- SLIDE 2: THE INSPIRATIONAL QUOTE -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 shadow-2xl border border-slate-800 overflow-hidden" data-slide-index="2">
+                <div class="absolute right-0 top-0 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl opacity-60"></div>
+                
+                <div class="flex justify-between items-center text-slate-400">
+                    <span class="text-xs font-bold uppercase tracking-widest font-display text-indigo-400">Refleksi Pembuka</span>
+                    <i class="fa-solid fa-quote-right text-3xl text-pink-500"></i>
+                </div>
+
+                <!-- Open Book/Journal Mockup -->
+                <div class="my-auto max-w-4xl mx-auto w-full">
+                    <div class="bg-slate-800/90 rounded-3xl shadow-2xl p-8 sm:p-10 border border-slate-700/60 relative animate-float">
+                        <div class="absolute -top-3 left-10 bg-gradient-to-r from-pink-500 to-indigo-500 text-white text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider">
+                            Pesan Kunci
+                        </div>
+                        <div class="space-y-6 text-center">
+                            <span class="text-5xl text-slate-600 font-serif leading-none block">“</span>
+                            <blockquote class="text-xl sm:text-2xl font-bold text-white font-display leading-relaxed">
+                                Internet adalah gerbang perpustakaan raksasa yang menakjubkan. Peran kita bukan sekadar mengagumi kebesarannya, melainkan cerdas memilih <span class="text-pink-400 underline decoration-wavy decoration-2">informasi berharga</span> demi masa depan gemilang.
+                            </blockquote>
+                            <div class="flex items-center justify-center gap-3 pt-2">
+                                <div class="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-bold">
+                                    <i class="fa-solid fa-user-graduate"></i>
+                                </div>
+                                <div class="text-left">
+                                    <cite class="not-italic text-sm font-bold text-slate-300 block">— Panduan Literasi Digital Pelajar Nasional</cite>
+                                    <span class="text-[10px] text-slate-500">Pusat Kurikulum & Pembelajaran</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Slide 2 dari 26
+                </div>
+            </div>
+
+            <!-- SLIDE 3: AGENDA BELAJAR (ZONA EKSPEDISI) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 shadow-2xl border border-slate-800 overflow-hidden text-white" data-slide-index="3">
+                <div class="flex justify-between items-center">
+                    <span class="bg-indigo-900/50 text-indigo-300 border border-indigo-800/50 px-3 py-1 rounded-full font-bold text-xs uppercase font-display">
+                        Rencana Perjalanan
+                    </span>
+                    <i class="fa-solid fa-map-location-dot text-2xl text-emerald-400"></i>
+                </div>
+
+                <div class="my-auto space-y-6">
+                    <h2 class="text-3xl font-extrabold font-display text-center text-white">4 Zona Petualangan Digital Kita</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl text-left space-y-3">
+                            <span class="text-xs font-mono text-cyan-400 font-bold">ZONA 01</span>
+                            <div class="w-10 h-10 bg-cyan-500/20 text-cyan-400 rounded-xl flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                            </div>
+                            <h3 class="font-bold text-sm text-white">Kecakapan</h3>
+                            <p class="text-[11px] text-slate-400">Cerdas mencari info, paham gawai, dan cerdik menggunakan AI.</p>
+                        </div>
+                        <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl text-left space-y-3">
+                            <span class="text-xs font-mono text-pink-400 font-bold">ZONA 02</span>
+                            <div class="w-10 h-10 bg-pink-500/20 text-pink-400 rounded-xl flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <h3 class="font-bold text-sm text-white">Budaya</h3>
+                            <p class="text-[11px] text-slate-400">Membawa etika bangsa & membangun jejak digital yang mulia.</p>
+                        </div>
+                        <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl text-left space-y-3">
+                            <span class="text-xs font-mono text-amber-400 font-bold">ZONA 03</span>
+                            <div class="w-10 h-10 bg-amber-500/20 text-amber-400 rounded-xl flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-scale-balanced"></i>
+                            </div>
+                            <h3 class="font-bold text-sm text-white">Etika</h3>
+                            <p class="text-[11px] text-slate-400">Stop cyberbullying, menghormati hak cipta, & jaga sopan santun.</p>
+                        </div>
+                        <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl text-left space-y-3">
+                            <span class="text-xs font-mono text-emerald-400 font-bold">ZONA 04</span>
+                            <div class="w-10 h-10 bg-emerald-500/20 text-emerald-400 rounded-xl flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <h3 class="font-bold text-sm text-white">Keamanan</h3>
+                            <p class="text-[11px] text-slate-400">Melindungi sandi, awasi penipuan, & jaga kesehatan screen-time.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-[10px] text-slate-500">
+                    Mari kita mulai perjalanan menjelajah Zona 1!
+                </div>
+            </div>
+
+            <!-- SLIDE 4: DEFINISI LITERASI DIGITAL (ZONA 1 START) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="4">
+                <div class="flex justify-between items-center">
+                    <span class="bg-indigo-900/40 text-indigo-300 border border-indigo-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Zona 1: Definisi Dasar
+                    </span>
+                    <i class="fa-solid fa-compass text-2xl text-cyan-400 animate-spin-slow"></i>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto">
+                    <div class="md:col-span-6 space-y-4">
+                        <span class="text-pink-400 font-bold uppercase tracking-widest text-xs block">💡 APA MAKSUDNYA?</span>
+                        <h2 class="text-2xl sm:text-4xl font-extrabold font-display leading-tight text-white">
+                            Lebih dari Sekadar <span class="text-cyan-400 underline decoration-wavy">Bisa Chatting</span>
+                        </h2>
+                        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+                            Literasi Digital bukan sekadar bisa mengetik chat atau memainkan gim daring. Literasi Digital adalah <strong>kemampuan kritis</strong> untuk mencari, menganalisis, memverifikasi, membuat, dan membagikan pesan internet secara <span class="text-amber-400 font-semibold">cerdas, aman, dan bertanggung jawab.</span>
+                        </p>
+                    </div>
+                    
+                    <div class="md:col-span-6">
+                        <div class="dark-glass-card rounded-2xl p-5 border border-slate-700/80 space-y-4 shadow-xl text-left">
+                            <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
+                                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                                <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                                <span class="text-xs text-slate-400 ml-2 font-mono">analisis_kemampuan.sh</span>
+                            </div>
+                            <div class="space-y-2.5 font-mono text-xs">
+                                <div class="flex justify-between border-b border-slate-800/40 py-1">
+                                    <span class="text-slate-400">Teknis (Gawai & Software)</span>
+                                    <span class="text-emerald-400 font-bold">TERPASANG <i class="fa-solid fa-circle-check"></i></span>
+                                </div>
+                                <div class="flex justify-between border-b border-slate-800/40 py-1">
+                                    <span class="text-slate-400">Kritis (Uji Kebenaran Hoaks)</span>
+                                    <span class="text-emerald-400 font-bold">TERPASANG <i class="fa-solid fa-circle-check"></i></span>
+                                </div>
+                                <div class="flex justify-between border-b border-slate-800/40 py-1">
+                                    <span class="text-slate-400">Komunikatif (Sopan Santun Chat)</span>
+                                    <span class="text-emerald-400 font-bold">TERPASANG <i class="fa-solid fa-circle-check"></i></span>
+                                </div>
+                                <div class="flex justify-between py-1">
+                                    <span class="text-slate-400">Keamanan (Proteksi Privasi)</span>
+                                    <span class="text-amber-400 font-bold">PERLU UPDATE <i class="fa-solid fa-clock-rotate-left"></i></span>
+                                </div>
+                            </div>
+                            <div class="bg-indigo-950/80 p-3 rounded-xl border border-indigo-500/20 text-[11px] text-slate-300">
+                                🚀 <span class="text-white font-bold">Fokus Hari ini:</span> Kita akan meningkatkan skor keamanan digitalmu agar bebas dari penipuan!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center text-xs text-slate-500 border-t border-slate-800 pt-3">
+                    <span>Materi Literasi Digital Tingkat Menengah</span>
+                    <span>Peta Kekuatan 4 Pilar ⬇</span>
+                </div>
+            </div>
+
+            <!-- SLIDE 5: PENJELASAN 4 PILAR DETAIL -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="5">
+                <div class="flex justify-between items-center">
+                    <span class="bg-slate-800 text-slate-300 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Sistem Kekuatan
+                    </span>
+                    <span class="text-xs text-pink-400 font-bold">Peta Kompetensi</span>
+                </div>
+
+                <div class="my-auto space-y-6">
+                    <div class="text-center space-y-1">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display text-white">4 Pilar Fondasi Digital Indonesia</h2>
+                        <p class="text-xs text-slate-400">Kerangka resmi literasi digital oleh Kementerian Komunikasi dan Informatika</p>
+                    </div>
+
+                    <!-- Modern Grid of 4 Pillars detailed description -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="bg-cyan-950/40 border border-cyan-800/40 rounded-2xl p-4 flex flex-col justify-between text-left hover:-translate-y-1 transition duration-300">
+                            <div class="w-10 h-10 bg-cyan-500 rounded-xl flex items-center justify-center text-white text-lg mb-3 shadow-md">
+                                <i class="fa-solid fa-laptop-code"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <h3 class="font-bold text-sm text-cyan-300">Digital Skills</h3>
+                                <p class="text-[10.5px] text-slate-300">Kecakapan menggunakan perangkat keras, aplikasi, dan sistem operasi dengan gesit.</p>
+                            </div>
+                        </div>
+                        <div class="bg-pink-950/40 border border-pink-800/40 rounded-2xl p-4 flex flex-col justify-between text-left hover:-translate-y-1 transition duration-300">
+                            <div class="w-10 h-10 bg-pink-500 rounded-xl flex items-center justify-center text-white text-lg mb-3 shadow-md">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <h3 class="font-bold text-sm text-pink-300">Digital Culture</h3>
+                                <p class="text-[10.5px] text-slate-300">Membawa kepribadian mulia Pancasila & Bhinneka Tunggal Ika dalam dunia maya.</p>
+                            </div>
+                        </div>
+                        <div class="bg-amber-950/40 border border-amber-800/40 rounded-2xl p-4 flex flex-col justify-between text-left hover:-translate-y-1 transition duration-300">
+                            <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center text-white text-lg mb-3 shadow-md">
+                                <i class="fa-solid fa-scale-balanced"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <h3 class="font-bold text-sm text-amber-300">Digital Ethics</h3>
+                                <p class="text-[10.5px] text-slate-300">Etiket dalam merespons informasi serta menghargai orang lain di dunia maya.</p>
+                            </div>
+                        </div>
+                        <div class="bg-emerald-950/40 border border-emerald-800/40 rounded-2xl p-4 flex flex-col justify-between text-left hover:-translate-y-1 transition duration-300">
+                            <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white text-lg mb-3 shadow-md">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <h3 class="font-bold text-sm text-emerald-300">Digital Safety</h3>
+                                <p class="text-[10.5px] text-slate-300">Perlindungan gawai, data pribadi, identitas diri, dan keamanan sosial.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Mari bedah Pilar Pertama: Kecakapan Digital
+                </div>
+            </div>
+
+            <!-- SLIDE 6: PILAR 1 - KECAKAPAN DIGITAL INTRO -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="6">
+                <div class="absolute right-0 top-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-[110px]"></div>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-cyan-400 font-bold tracking-widest text-xs uppercase font-display">Pilar Pertama</span>
+                    <i class="fa-solid fa-laptop-code text-cyan-400 text-2xl"></i>
+                </div>
+
+                <div class="my-auto text-center space-y-6 max-w-2xl mx-auto">
+                    <div class="w-20 h-20 bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 mx-auto rounded-3xl flex items-center justify-center text-4xl shadow-xl animate-float">
+                        💻
+                    </div>
+                    <div class="space-y-2">
+                        <h2 class="text-3xl sm:text-5xl font-black font-display text-white">Kecakapan Digital</h2>
+                        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+                            Mempelajari taktik pencarian Google yang jitu, mengelola berkas digital tugas sekolah, serta memilah kecerdasan buatan (AI) secara bijak demi hasil belajar yang unggul.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center text-xs text-slate-500 border-t border-slate-800/50 pt-3">
+                    <span>Materi Kecakapan Digital Tingkat SMP</span>
+                    <span>TIPS GOOGLE PRO ⬇</span>
+                </div>
+            </div>
+
+            <!-- SLIDE 7: TRIK GOOGLE PRO (DETIL SEARCH OPERATOR) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="7">
+                <div class="flex justify-between items-center">
+                    <span class="bg-cyan-900/40 text-cyan-300 border border-cyan-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Pilar 1: Trik Mesin Pencari
+                    </span>
+                    <span class="text-xs text-slate-400">Bukan Sekadar Pencarian Acak</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto">
+                    <!-- Text Columns -->
+                    <div class="md:col-span-6 space-y-4 text-left">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white font-display">
+                            Menjadi <span class="text-cyan-400">Google Search Pro!</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Saat mencari referensi tugas atau bahan presentasi, jangan hanya mengetik kalimat panjang di Google. Gunakan trik operator pencarian berikut:
+                        </p>
+                        
+                        <div class="space-y-2">
+                            <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700/50 flex items-start gap-3">
+                                <div class="bg-cyan-500/20 text-cyan-400 p-1 rounded font-mono text-xs font-bold shrink-0">"..."</div>
+                                <p class="text-xs text-slate-300 leading-normal">
+                                    <strong>Pencarian Persis:</strong> Gunakan tanda petik untuk mencari kata yang sama persis. Contoh: <code class="text-amber-400 font-mono">"pilar literasi digital"</code>
+                                </p>
+                            </div>
+                            <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700/50 flex items-start gap-3">
+                                <div class="bg-cyan-500/20 text-cyan-400 p-1 rounded font-mono text-xs font-bold shrink-0">filetype:</div>
+                                <p class="text-xs text-slate-300 leading-normal">
+                                    <strong>Cari Format Berkas:</strong> Langsung mengunduh PDF atau dokumen. Contoh: <code class="text-amber-400 font-mono">ekosistem laut filetype:pdf</code>
+                                </p>
+                            </div>
+                            <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700/50 flex items-start gap-3">
+                                <div class="bg-cyan-500/20 text-cyan-400 p-1 rounded font-mono text-xs font-bold shrink-0">site:</div>
+                                <p class="text-xs text-slate-300 leading-normal">
+                                    <strong>Cari Hanya di Web Resmi:</strong> Contoh: <code class="text-amber-400 font-mono">kurikulum merdeka site:kemdikbud.go.id</code>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Browser Mockup -->
+                    <div class="md:col-span-6">
+                        <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 overflow-hidden animate-float text-left">
+                            <div class="bg-slate-900 px-4 py-2 flex items-center justify-between border-b border-slate-800">
+                                <div class="flex gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                                </div>
+                                <div class="bg-slate-950 text-[9px] text-slate-400 px-3 py-1 rounded-full w-2/3 text-center truncate font-mono">
+                                    https://www.google.com/search
+                                </div>
+                                <i class="fa-solid fa-rotate-right text-slate-500 text-xs"></i>
+                            </div>
+                            <!-- Mock Search Page -->
+                            <div class="p-4 space-y-3">
+                                <div class="flex items-center gap-2 border border-slate-700 rounded-full px-3 py-1.5 shadow-sm text-xs bg-slate-950">
+                                    <i class="fa-solid fa-magnifying-glass text-cyan-400"></i>
+                                    <span class="text-slate-200 font-mono font-bold text-[10px]">pencemaran lingkungan filetype:pdf</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="p-2 bg-slate-900/60 border border-slate-800 rounded-xl space-y-1">
+                                        <span class="text-[8px] text-emerald-400 font-mono block">https://kelautan.go.id > files > pdf</span>
+                                        <h4 class="font-bold text-xs text-blue-400 hover:underline cursor-pointer flex items-center gap-1">
+                                            <i class="fa-solid fa-file-pdf text-rose-500 text-[11px]"></i> Buku_Saku_Pencegahan_Pencemaran.pdf
+                                        </h4>
+                                        <p class="text-[9px] text-slate-400 leading-normal">Kumpulan data dan metodologi ilmiah mitigasi dampak buruk sampah plastik di perairan Indonesia.</p>
+                                    </div>
+                                    <div class="p-2 bg-slate-900/60 border border-slate-800 rounded-xl space-y-1">
+                                        <span class="text-[8px] text-emerald-400 font-mono block">https://smp.kemdikbud.go.id > download</span>
+                                        <h4 class="font-bold text-xs text-blue-400 hover:underline cursor-pointer flex items-center gap-1">
+                                            <i class="fa-solid fa-file-pdf text-rose-500 text-[11px]"></i> Modul_IPAS_Kelas_7_Pencemaran.pdf
+                                        </h4>
+                                        <p class="text-[9px] text-slate-400 leading-normal">Modul pembelajaran mandiri siswa SMP kurikulum merdeka materi bab lingkungan hidup.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Gunakan taktik pencarian cerdas ini untuk tugas sekolahmu!
+                </div>
+            </div>
+
+            <!-- SLIDE 8: MENILAI SUMBER VALID VS PALSU -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="8">
+                <div class="flex justify-between items-center">
+                    <span class="bg-cyan-900/40 text-cyan-300 border border-cyan-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Pilar 1: Kredibilitas Data
+                    </span>
+                    <i class="fa-solid fa-scale-balanced text-amber-400"></i>
+                </div>
+
+                <div class="my-auto space-y-4">
+                    <div class="text-center space-y-1">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display">Bedakan Sumber Valid vs Abal-Abal</h2>
+                        <p class="text-xs text-slate-400">Kunci penting agar tugas makalahmu tidak dicap mengambil dari kabar bohong</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Valid Source -->
+                        <div class="bg-emerald-950/20 border-2 border-emerald-500/20 rounded-2xl p-5 text-left space-y-3">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-check"></i> SUMBER TERPERCAYA
+                                </span>
+                            </div>
+                            <ul class="space-y-2 text-xs text-slate-300">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                    <span><strong>Domain Resmi:</strong> Berakhiran <code class="text-emerald-300">.go.id</code> (pemerintah), <code class="text-emerald-300">.or.id</code> (organisasi resmi), atau <code class="text-emerald-300">.edu / .ac.id</code> (akademis).</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                    <span><strong>Penulis Jelas:</strong> Tercantum nama peneliti, jurnalis profesional, atau lembaga kredibel (LIPI, Kemendikbud, WHO).</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check text-emerald-400 mt-0.5"></i>
+                                    <span><strong>Data Objektif:</strong> Berisi grafik, kutipan riset ilmiah, dan bukan opini pribadi yang dipenuhi amarah.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Invalid Source -->
+                        <div class="bg-rose-950/20 border-2 border-rose-500/20 rounded-2xl p-5 text-left space-y-3">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-rose-500/20 text-rose-400 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-xmark"></i> SUMBER ABAL-ABAL (HINDARI!)
+                                </span>
+                            </div>
+                            <ul class="space-y-2 text-xs text-slate-300">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-xmark text-rose-400 mt-0.5"></i>
+                                    <span><strong>Situs Blog Bebas:</strong> Domain gratisan seperti <code class="text-rose-300">.blogspot.com</code>, <code class="text-rose-300">.wordpress.com</code> tanpa verifikasi redaksi resmi.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-xmark text-rose-400 mt-0.5"></i>
+                                    <span><strong>Anonim:</strong> Tidak ada nama penulis yang bertanggung jawab, atau menggunakan inisial samaran yang tidak terlacak.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-xmark text-rose-400 mt-0.5"></i>
+                                    <span><strong>Judul Provokatif:</strong> Menggunakan huruf kapital semua dan kalimat jebakan klik (clickbait) berlebihan.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Nilailah dengan kritis sebelum mempercayai artikel online!
+                </div>
+            </div>
+
+            <!-- SLIDE 9: PENGENALAN AI SECARA BIJAK (BARU & DETAIL) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="9">
+                <div class="flex justify-between items-center">
+                    <span class="bg-cyan-900/40 text-cyan-300 border border-cyan-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Pilar 1: Kecerdasan Buatan (AI)
+                    </span>
+                    <i class="fa-solid fa-brain text-purple-400 animate-pulse"></i>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto">
+                    <!-- Text Left -->
+                    <div class="md:col-span-7 space-y-4 text-left">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display">
+                            Bijak Menggunakan <span class="text-purple-400">Artificial Intelligence</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Alat kecerdasan buatan seperti ChatGPT, Gemini, atau Bing AI sudah sangat dekat dengan kita. Ingat pedoman ini saat menggunakannya untuk tugas sekolah:
+                        </p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div class="bg-emerald-950/20 border border-emerald-500/20 p-3 rounded-xl">
+                                <span class="font-bold text-emerald-400 block mb-1">👍 CARA YANG BENAR</span>
+                                <ul class="list-disc list-inside text-slate-300 space-y-1 text-[11px]">
+                                    <li>Gunakan untuk bertukar pikiran (brainstorming).</li>
+                                    <li>Membantu merapikan tata bahasa tugasmu.</li>
+                                    <li>Mencari sudut pandang/kerangka ide awal.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-rose-950/20 border border-rose-500/20 p-3 rounded-xl">
+                                <span class="font-bold text-rose-400 block mb-1">👎 CARA YANG SALAH</span>
+                                <ul class="list-disc list-inside text-slate-300 space-y-1 text-[11px]">
+                                    <li>Menyalin mentah-mentah (copy-paste) tugas AI.</li>
+                                    <li>Mempercayai data tanpa cek fakta ulang (halusinasi AI).</li>
+                                    <li>Malas berpikir mandiri & mematikan logika.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Robot Mockup -->
+                    <div class="md:col-span-5 flex justify-center">
+                        <div class="relative w-64 bg-slate-950 p-4 rounded-3xl border border-slate-800 shadow-xl text-center space-y-3 animate-float">
+                            <div class="w-12 h-12 bg-purple-500/20 text-purple-400 rounded-full flex items-center justify-center mx-auto text-xl">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-bold text-xs text-slate-200">AI Assistant SMP</h4>
+                                <span class="text-[9px] bg-indigo-500/10 text-indigo-400 px-2.5 py-0.5 rounded-full font-bold">Status: Siap Membantu</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 italic">
+                                "Tanyakan padaku ide-ide kreatif, tapi tulislah tugasmu menggunakan bahasamu sendiri yang jujur!"
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    AI adalah asisten cerdas, bukan pengganti kemampuan otakmu!
+                </div>
+            </div>
+
+            <!-- SLIDE 10: PILAR 2 - BUDAYA DIGITAL INTRO -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="10">
+                <div class="absolute left-0 bottom-0 w-80 h-80 bg-pink-500/10 rounded-full blur-[110px]"></div>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-pink-400 font-bold tracking-widest text-xs uppercase font-display">Pilar Kedua</span>
+                    <i class="fa-solid fa-globe text-pink-400 text-2xl"></i>
+                </div>
+
+                <div class="my-auto text-center space-y-6 max-w-2xl mx-auto">
+                    <div class="w-20 h-20 bg-pink-600/20 text-pink-400 border border-pink-500/30 mx-auto rounded-3xl flex items-center justify-center text-4xl shadow-xl animate-float">
+                        🌸
+                    </div>
+                    <div class="space-y-2">
+                        <h2 class="text-3xl sm:text-5xl font-black font-display text-white">Budaya Digital</h2>
+                        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+                            Membangun integritas diri yang luhur di dunia maya. Kita pelajari bahaya rekam jejak digital abadi serta penerapan nilai budi pekerti Pancasila dalam interaksi di internet.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center text-xs text-slate-500 border-t border-slate-800/50 pt-3">
+                    <span>Materi Budaya Digital Tingkat SMP</span>
+                    <span>JEJAK DIGITAL ABADI ⬇</span>
+                </div>
+            </div>
+
+            <!-- SLIDE 11: JEJAK DIGITAL ITU ABADI (RINCI & VISUAL) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="11">
+                <div class="flex justify-between items-center">
+                    <span class="bg-pink-900/40 text-pink-300 border border-pink-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Pilar 2: Budaya Digital
+                    </span>
+                    <span class="text-xs text-slate-400">Peta Rekam Jejak</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto">
+                    <!-- Text Left -->
+                    <div class="md:col-span-6 space-y-4 text-left">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display leading-tight">
+                            Jejak Digital <span class="text-pink-400">Sulit Dihapus!</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Setiap komentar mengejek, unggahan foto konyol saat marah, atau aktivitas membagikan konten negatif akan menetap di internet selamanya. Walau tombol hapus telah ditekan, orang lain bisa dengan cepat menangkap layar (screenshot) dan menyimpannya.
+                        </p>
+                        
+                        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700/50 text-xs space-y-2 text-slate-300">
+                            <strong>Mengapa Ini Berbahaya?</strong>
+                            <ul class="list-disc list-inside space-y-1 text-slate-400">
+                                <li>Sekolah unggulan & kampus impian sering mengecek jejak media sosial calon siswa baru.</li>
+                                <li>Penyaring beasiswa nasional melacak rekam jejak komentarmu.</li>
+                                <li>Sikap buruk di medsos bisa merusak hubungan dengan guru dan keluarga di dunia nyata.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Digital Profile Mockup -->
+                    <div class="md:col-span-6">
+                        <div class="bg-slate-950 rounded-2xl shadow-xl border border-slate-800 overflow-hidden text-left animate-float">
+                            <div class="bg-slate-900 p-3.5 flex items-center justify-between border-b border-slate-800">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-full bg-pink-500 flex items-center justify-center font-bold text-xs">P</div>
+                                    <div class="text-left">
+                                        <h4 class="text-xs font-bold text-slate-200">Putri_PelajarBijak</h4>
+                                        <span class="text-[8px] text-slate-500">Reputasi Digital Hijau</span>
+                                    </div>
+                                </div>
+                                <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full font-bold">Aktivitas Sehat</span>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <div class="border-l-2 border-emerald-500 pl-3 py-1 space-y-1">
+                                    <span class="text-[8px] text-slate-500 font-mono block">1 JAM LALU</span>
+                                    <p class="text-[11px] text-slate-300">"Semangat teman-teman kelas 7 atas kelulusan MPLS hari ini! Kita pasti bisa sukses bersama 🚀"</p>
+                                </div>
+                                <div class="border-l-2 border-emerald-500 pl-3 py-1 space-y-1">
+                                    <span class="text-[8px] text-slate-500 font-mono block">KEMARIN</span>
+                                    <p class="text-[11px] text-slate-300">Mengunggah resume visual "Langkah-langkah Memilah Sampah Plastik di Rumah"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Isilah harimu dengan jejak kebaikan digital yang inspiratif!
+                </div>
+            </div>
+
+            <!-- SLIDE 12: NETIKET / ETIKA CHATTING (DETIL CHAT MOCKUP) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="12">
+                <div class="flex justify-between items-center">
+                    <span class="bg-pink-900/40 text-pink-300 border border-pink-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Pilar 2: Netiket Chat
+                    </span>
+                    <i class="fa-solid fa-comments text-emerald-400"></i>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto">
+                    <!-- WhatsApp Mobile Mockup -->
+                    <div class="md:col-span-5 flex justify-center">
+                        <div class="relative w-60 h-[330px] bg-slate-950 rounded-[2.2rem] p-3 shadow-2xl border-4 border-slate-700 animate-float text-left">
+                            <div class="bg-[#efeae2] h-full w-full rounded-[1.8rem] overflow-hidden flex flex-col justify-between relative border border-slate-850">
+                                <!-- Chat Header -->
+                                <div class="bg-emerald-850 text-white p-2.5 flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-slate-800 text-[10px] font-bold">W</div>
+                                    <div class="leading-none text-left">
+                                        <h5 class="text-[9px] font-bold text-white block">Grup OSIS SMP</h5>
+                                        <span class="text-[7px] text-slate-300">Andi, Kak Budi, Kamu</span>
+                                    </div>
+                                </div>
+                                <!-- Chat Area -->
+                                <div class="p-2.5 space-y-2 flex-grow overflow-y-auto flex flex-col justify-end text-[9px]">
+                                    <!-- Bad chat -->
+                                    <div class="bg-rose-100 border border-rose-200 p-2 rounded-xl rounded-tl-none self-start max-w-[85%] text-slate-800">
+                                        <span class="text-[7px] font-bold text-rose-500 block">Boni (Kurang Sopan)</span>
+                                        <p class="font-bold leading-tight">WOI TUGAS BROSUR DIKUMPUL SEKARANG KAN?? JANGAN LEMOT DONG!</p>
+                                    </div>
+                                    <!-- Good Reply -->
+                                    <div class="bg-white border border-emerald-100 p-2 rounded-xl rounded-tr-none self-end max-w-[85%] text-slate-800">
+                                        <span class="text-[7px] font-bold text-emerald-600 block">Siti (Sopan & Netiket Baik)</span>
+                                        <p class="leading-tight">Selamat sore rekan OSIS, mohon izin mengingatkan pengumpulan brosur malam ini pukul 19.00 ya. Terima kasih.</p>
+                                    </div>
+                                </div>
+                                <!-- Input -->
+                                <div class="bg-white p-2 flex items-center gap-1 border-t border-slate-200">
+                                    <div class="bg-slate-100 text-[8px] px-3 py-1 rounded-full flex-grow text-slate-400">Ketik pesan...</div>
+                                    <i class="fa-solid fa-paper-plane text-emerald-700 text-[10px]"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Explanatory Text Right -->
+                    <div class="md:col-span-7 space-y-4 text-left">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display">
+                            Aturan Emas <span class="text-pink-400">Etika Chatting</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Interaksi di grup WhatsApp kelas, komentar YouTube, atau obrolan gim daring mencerminkan kualitas kepribadianmu. Perhatikan etika dasar berikut:
+                        </p>
+                        
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-2.5 text-xs text-slate-300">
+                                <i class="fa-solid fa-bell text-pink-400 text-sm mt-0.5"></i>
+                                <span><strong>Pilih Waktu yang Pas:</strong> Jangan mengirim pesan chat kepada Guru di luar jam kerja/belajar (kecuali situasi darurat).</span>
+                            </li>
+                            <li class="flex items-start gap-2.5 text-xs text-slate-300">
+                                <i class="fa-solid fa-arrow-up-a-z text-pink-400 text-sm mt-0.5"></i>
+                                <span><strong>Hindari Caps Lock Berlebih:</strong> Menggunakan huruf besar semua dinilai berkesan berteriak, kasar, atau marah.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5 text-xs text-slate-300">
+                                <i class="fa-solid fa-face-smile-beam text-pink-400 text-sm mt-0.5"></i>
+                                <span><strong>Gunakan Salam & Kata Ajaib:</strong> Awali chat dengan sopan, gunakan kata "Tolong", "Maaf", dan "Terima kasih".</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Mulutmu adalah harimaumu, di internet jemarimu adalah harimaumu!
+                </div>
+            </div>
+
+            <!-- SLIDE 13: PILAR 3 - ETIKA DIGITAL INTRO -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="13">
+                <div class="absolute right-0 top-0 w-80 h-80 bg-amber-500/10 rounded-full blur-[110px]"></div>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-amber-400 font-bold tracking-widest text-xs uppercase font-display">Pilar Ketiga</span>
+                    <i class="fa-solid fa-scale-balanced text-amber-400 text-2xl"></i>
+                </div>
+
+                <div class="my-auto text-center space-y-6 max-w-2xl mx-auto">
+                    <div class="w-20 h-20 bg-amber-600/20 text-amber-400 border border-amber-500/30 mx-auto rounded-3xl flex items-center justify-center text-4xl shadow-xl animate-float">
+                        ⚖
+                    </div>
+                    <div class="space-y-2">
+                        <h2 class="text-3xl sm:text-5xl font-black font-display text-white">Etika Digital</h2>
+                        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+                            Belajar tentang bahaya intimidasi dunia maya (cyberbullying), cara membela teman, serta taktik menghargai karya cipta orang lain di internet demi iklim belajar yang harmonis.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center text-xs text-slate-500 border-t border-slate-800/50 pt-3">
+                    <span>Materi Etika Digital Tingkat SMP</span>
+                    <span>STOP CYBERBULLYING ⬇</span>
+                </div>
+            </div>
+
+            <!-- SLIDE 14: STOP CYBERBULLYING (RINCI) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="14">
+                <div class="flex justify-between items-center">
+                    <span class="bg-amber-900/40 text-amber-300 border border-amber-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Pilar 3: Empati Online
+                    </span>
+                    <i class="fa-solid fa-heart-pulse text-rose-500"></i>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto">
+                    <!-- Text Left -->
+                    <div class="md:col-span-7 space-y-4 text-left">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display leading-tight">
+                            Stop <span class="text-amber-400">Cyberbullying!</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            <strong>Cyberbullying</strong> adalah perilaku berulang yang ditujukan untuk menakuti, membuat marah, atau mempermalukan mereka yang menjadi sasaran melalui teknologi digital. Korban bullying mengalami beban mental yang sangat berat.
+                        </p>
+                        
+                        <div class="bg-slate-800/80 p-4 border border-slate-700/55 rounded-xl space-y-2">
+                            <span class="text-xs font-bold text-white block">Tindakan Penyelamatan yang Bisa Kamu Lakukan:</span>
+                            <ul class="space-y-1.5 text-[11px] text-slate-300 list-disc list-inside">
+                                <li><strong>Jangan Ikut Tertawa:</strong> Hindari menyukai (like), berkomentar mendukung, atau membagikan postingan ejekan tersebut.</li>
+                                <li><strong>Beri Dukungan Moral:</strong> Hubungi korban secara pribadi, berikan kata-kata penguatan agar ia merasa tidak sendirian.</li>
+                                <li><strong>Laporkan ke Pihak Berwenang:</strong> Laporkan insiden tersebut ke Guru Wali Kelas, Guru BK, atau orang tua terpercaya.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Cyber Support Mockup Card -->
+                    <div class="md:col-span-5 flex justify-center">
+                        <div class="bg-gradient-to-tr from-amber-500 to-rose-500 p-5 rounded-3xl shadow-xl w-64 text-center text-white relative overflow-hidden animate-float">
+                            <div class="absolute -left-4 -top-4 w-16 h-16 bg-white/20 rounded-full blur-lg"></div>
+                            <i class="fa-solid fa-handshake-angle text-3xl mb-2.5"></i>
+                            <h4 class="font-bold text-base font-display mb-1">Dukung Sahabatmu</h4>
+                            <p class="text-[10px] text-white/95 leading-normal mb-4">
+                                "Satu sapaan penuh kepedulian darimu dapat menyelamatkan hari berat yang sedang dihadapi teman dekatmu."
+                            </p>
+                            <button onclick="triggerConfetti()" class="bg-white text-rose-600 hover:bg-slate-100 transition px-4 py-2 rounded-full font-bold text-[10px] shadow-md">
+                                <i class="fa-solid fa-heart mr-1 text-rose-500 animate-pulse"></i> Kirim Semangat Kebaikan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Internet adalah ruang kolaborasi, bukan tempat meluapkan kebencian!
+                </div>
+            </div>
+
+            <!-- SLIDE 15: INTERAKTIF - TEBAK KASUS BULLYING (KARTU ELEKTRONIK) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="15">
+                <div class="flex justify-between items-center">
+                    <span class="bg-amber-900/40 text-amber-300 border border-amber-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Pilar 3: Kuis Deteksi Cepat
+                    </span>
+                    <span class="text-xs text-slate-400">Bahan Diskusi Kelas</span>
+                </div>
+
+                <div class="my-auto space-y-5">
+                    <div class="text-center space-y-1">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display">Apakah Ini Termasuk Cyberbullying?</h2>
+                        <p class="text-xs text-slate-400">Klik kartu di bawah ini untuk melihat ulasan kunci dari para pakar etika</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Card 1 -->
+                        <div onclick="revealBullying(1)" id="b-card-1" class="bg-slate-800/90 border border-slate-700/60 p-4.5 rounded-2xl text-left hover:border-amber-400 transition cursor-pointer relative h-36 flex flex-col justify-between">
+                            <div class="space-y-1">
+                                <span class="text-[9px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full font-bold">KASUS A</span>
+                                <p class="text-[11px] font-semibold text-slate-200">"Membuat meme lucu dari foto wajah teman yang sedang menguap tanpa izinnya di grup chat."</p>
+                            </div>
+                            <span id="b-ans-1" class="text-[10px] text-amber-400 font-bold">KLIK UNTUK JAWABAN ➔</span>
+                        </div>
+                        <!-- Card 2 -->
+                        <div onclick="revealBullying(2)" id="b-card-2" class="bg-slate-800/90 border border-slate-700/60 p-4.5 rounded-2xl text-left hover:border-amber-400 transition cursor-pointer relative h-36 flex flex-col justify-between">
+                            <div class="space-y-1">
+                                <span class="text-[9px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full font-bold">KASUS B</span>
+                                <p class="text-[11px] font-semibold text-slate-200">"Menegur secara sopan melalui DM pribadi kepada teman yang membagikan info palsu."</p>
+                            </div>
+                            <span id="b-ans-2" class="text-[10px] text-amber-400 font-bold">KLIK UNTUK JAWABAN ➔</span>
+                        </div>
+                        <!-- Card 3 -->
+                        <div onclick="revealBullying(3)" id="b-card-3" class="bg-slate-800/90 border border-slate-700/60 p-4.5 rounded-2xl text-left hover:border-amber-400 transition cursor-pointer relative h-36 flex flex-col justify-between">
+                            <div class="space-y-1">
+                                <span class="text-[9px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full font-bold">KASUS C</span>
+                                <p class="text-[11px] font-semibold text-slate-200">"Mengirim chat bertubi-tubi mengejek teman yang kalah dalam pertandingan game online."</p>
+                            </div>
+                            <span id="b-ans-3" class="text-[10px] text-amber-400 font-bold">KLIK UNTUK JAWABAN ➔</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Mari budayakan saling menghargai kenyamanan psikologis sesama rekan sekolah!
+                </div>
+            </div>
+
+            <!-- SLIDE 16: MENGHARGAI HAK CIPTA & PLAGIARISME -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="16">
+                <div class="flex justify-between items-center">
+                    <span class="bg-amber-900/40 text-amber-300 border border-amber-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Pilar 3: Karya Kreatif & HAKI
+                    </span>
+                    <i class="fa-solid fa-copyright text-slate-500 text-xl"></i>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto">
+                    <!-- Cards Grid Left -->
+                    <div class="md:col-span-6 grid grid-cols-1 gap-3.5">
+                        <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/50 flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center text-lg shrink-0">
+                                <i class="fa-solid fa-hand-holding-hand"></i>
+                            </div>
+                            <div class="text-left text-xs">
+                                <strong class="text-white block font-display">Biasakan Meminta Izin</strong>
+                                <span class="text-slate-400">Gunakan karya seni, ilustrasi, atau musik milik orang lain setelah meminta izin resmi kreatornya.</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/50 flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg shrink-0">
+                                <i class="fa-solid fa-link-slash"></i>
+                            </div>
+                            <div class="text-left text-xs">
+                                <strong class="text-white block font-display">Tuliskan Sumber Rujukan</strong>
+                                <span class="text-slate-400">Menyalin tulisan bulat-bulat tanpa menyertakan pranala (link) adalah tindakan plagiarisme.</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/50 flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg shrink-0">
+                                <i class="fa-solid fa-paint-brush"></i>
+                            </div>
+                            <div class="text-left text-xs">
+                                <strong class="text-white block font-display">Gunakan Material Bebas Royalti</strong>
+                                <span class="text-slate-400">Temukan ilustrasi gratis di situs Unsplash, Pixabay, atau Pexels yang aman digunakan untuk tugas sekolah.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Plagiarism Warning Block -->
+                    <div class="md:col-span-6 space-y-4 text-left">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display leading-tight">
+                            Hargai <span class="text-amber-400">Hak Cipta Karya Cerdas</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Internet penuh dengan karya kreatif berkualitas tinggi. Jadilah pelajar yang berbudaya jujur dengan tidak melakukan pencurian intelektual.
+                        </p>
+                        <div class="bg-amber-950/20 border border-amber-800/50 p-4 rounded-xl text-xs text-amber-300">
+                            💡 <strong>Tip Cerdas:</strong> Ketika mengunggah tugas sekolah, tambahkan halaman daftar pustaka atau cantumkan daftar URL pembuat konten asli sebagai bentuk integritas akademismu.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Mari hargai karya orang lain sebagaimana kamu ingin karyamu dihargai!
+                </div>
+            </div>
+
+            <!-- SLIDE 17: PILAR 4 - KEAMANAN DIGITAL INTRO -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="17">
+                <div class="absolute right-0 bottom-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-[110px]"></div>
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-emerald-400 font-bold tracking-widest text-xs uppercase font-display">Pilar Keempat</span>
+                    <i class="fa-solid fa-shield-halved text-emerald-400 text-2xl"></i>
+                </div>
+
+                <div class="my-auto text-center space-y-6 max-w-2xl mx-auto">
+                    <div class="w-20 h-20 bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 mx-auto rounded-3xl flex items-center justify-center text-4xl shadow-xl animate-float">
+                        🛡️
+                    </div>
+                    <div class="space-y-2">
+                        <h2 class="text-3xl sm:text-5xl font-black font-display text-white">Keamanan Digital</h2>
+                        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+                            Mempelajari seni memasang perisai pertahanan akun, menjaga keamanan kerahasiaan data pribadi, menguji kekuatan sandi, serta menghindari rekayasa sosial phising.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center text-xs text-slate-500 border-t border-slate-800/50 pt-3">
+                    <span>Materi Keamanan Digital Tingkat SMP</span>
+                    <span>JAGA DATA PRIBADI ⬇</span>
+                </div>
+            </div>
+
+            <!-- SLIDE 18: MENJAGA DATA PRIBADI (PENTING & DETAIL) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="18">
+                <div class="flex justify-between items-center">
+                    <span class="bg-emerald-900/40 text-emerald-300 border border-emerald-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Pilar 4: Privasi Data
+                    </span>
+                    <i class="fa-solid fa-user-shield text-emerald-400"></i>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto">
+                    <!-- Secure List Left -->
+                    <div class="md:col-span-7 space-y-4 text-left">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display">
+                            Pasang Perisai <span class="text-emerald-400">Data Dirimu!</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Jangan asal mengisi data atau memposting informasi di forum online maupun akun publik media sosial. Pelajari batasannya secara ketat:
+                        </p>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Boleh Bagikan -->
+                            <div class="bg-emerald-950/20 border-2 border-dashed border-emerald-500/20 p-4 rounded-xl text-left space-y-1.5">
+                                <span class="text-xs font-bold text-emerald-300 flex items-center gap-1">
+                                    <i class="fa-solid fa-circle-check"></i> BOLEH DI-SHARE
+                                </span>
+                                <ul class="text-[10px] text-slate-300 list-disc list-inside space-y-0.5">
+                                    <li>Hobi positif & bakat olahraga</li>
+                                    <li>Buku dan musik kegemaran</li>
+                                    <li>Prestasi dan karya seni buatanmu</li>
+                                    <li>Komentar edukatif yang memuji</li>
+                                </ul>
+                            </div>
+                            <!-- Tidak Boleh Bagikan -->
+                            <div class="bg-rose-950/20 border-2 border-dashed border-rose-500/20 p-4 rounded-xl text-left space-y-1.5">
+                                <span class="text-xs font-bold text-rose-400 flex items-center gap-1">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> RAHASIAKAN JANGAN SHARE
+                                </span>
+                                <ul class="text-[10px] text-slate-300 list-disc list-inside space-y-0.5">
+                                    <li>Sandi (password) & kode PIN OTP</li>
+                                    <li>Alamat lengkap rumah & sekolah</li>
+                                    <li>Nama gadis Ibu kandung</li>
+                                    <li>Foto KTP/KK/Akte Kelahiran</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Digital Lock Graphic Mockup -->
+                    <div class="md:col-span-5 flex justify-center">
+                        <div class="bg-slate-950 text-white rounded-3xl shadow-xl w-60 p-5 border border-slate-800 animate-float text-center space-y-4 relative overflow-hidden">
+                            <div class="absolute -right-6 -top-6 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl"></div>
+                            <div class="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto border border-emerald-500/40 text-xl text-emerald-400">
+                                <i class="fa-solid fa-fingerprint"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-bold text-xs">Sistem Enkripsi Privasi</h4>
+                                <span class="text-[8px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">TERKUNCI AMAN</span>
+                            </div>
+                            <div class="bg-slate-900 py-2 px-4 rounded-xl font-mono text-[10px] text-slate-300 border border-slate-800">
+                                ••••••••••••
+                            </div>
+                            <p class="text-[9px] text-slate-500 leading-normal">
+                                Kode verifikasi SMS (OTP) adalah kunci rahasia akunmu. Jangan pernah berikan ke siapa pun, bahkan orang dekat!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Keamanan akunmu berakar dari kebijakan jemarimu memilah data pribadi!
+                </div>
+            </div>
+
+            <!-- SLIDE 19: INTERAKTIF WIDGET - PASSWORD STRENGTH TESTER (WIDGET HIDUP!) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="19">
+                <div class="flex justify-between items-center">
+                    <span class="bg-emerald-900/40 text-emerald-300 border border-emerald-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Pilar 4: Simulasi Keamanan
+                    </span>
+                    <i class="fa-solid fa-key text-yellow-400"></i>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto">
+                    <!-- Tester Widget Panel Left -->
+                    <div class="md:col-span-6">
+                        <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow-xl text-left space-y-4">
+                            <h3 class="font-bold text-sm text-slate-200">Uji Kekuatan Sandi Milikmu</h3>
+                            
+                            <div class="space-y-2">
+                                <label class="text-[10px] text-slate-400 font-mono block">KETIK KATA SANDI SIMULASI:</label>
+                                <div class="relative">
+                                    <input oninput="testPasswordStrength(this.value)" type="text" placeholder="Masukkan sandi..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+                                </div>
+                            </div>
+
+                            <!-- Indicator Bar -->
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center text-[10px]">
+                                    <span class="text-slate-400">Tingkat Kekuatan:</span>
+                                    <span id="pwd-label" class="font-bold text-rose-500">SANGAT LEMAH</span>
+                                </div>
+                                <div class="w-full bg-slate-900 rounded-full h-2">
+                                    <div id="pwd-bar" class="bg-rose-500 h-2 rounded-full transition-all duration-300" style="width: 15%"></div>
+                                </div>
+                            </div>
+
+                            <p id="pwd-tip" class="text-[10px] text-slate-400 italic">
+                                "Sandi terlalu pendek! Masukkan minimal 8 karakter."
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Sandbox Info Right -->
+                    <div class="md:col-span-6 text-left space-y-4">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display">
+                            Bagaimana Membuat <span class="text-emerald-400">Sandi Super Kuat?</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Peretas menggunakan komputer berspesifikasi tinggi untuk menebak sandimu dalam hitungan detik jika kamu menggunakan kombinasi yang umum. Gunakan jurus jitu ini:
+                        </p>
+                        
+                        <div class="space-y-2 text-xs">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i>
+                                <span>Gunakan gabungan huruf BESAR, huruf kecil, angka, dan simbol (misal: @, #, $).</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i>
+                                <span>Gunakan metode "Frasa Sandi" (menggabungkan 4 kata acak, misal: <code class="text-amber-300 font-mono">KucingLompatBintang9!</code>).</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-circle-xmark text-rose-400 shrink-0"></i>
+                                <span>Hindari menggunakan tanggal lahir, nama sekolah, atau kata umum seperti <code class="text-rose-300 font-mono">12345678</code>.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Ujilah sandimu di atas dan lihat perubahannya secara instan!
+                </div>
+            </div>
+
+            <!-- SLIDE 20: WASPADA PHISING & PENIPUAN (PHISING SCAM EXPLAINED) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="20">
+                <div class="flex justify-between items-center">
+                    <span class="bg-emerald-900/40 text-emerald-300 border border-emerald-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Pilar 4: Ancaman Phising
+                    </span>
+                    <i class="fa-solid fa-fish-fins text-rose-400"></i>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto">
+                    <!-- Explanation Left -->
+                    <div class="md:col-span-7 space-y-4 text-left">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display leading-tight">
+                            Waspada Ranjau <span class="text-rose-400">Phising Digital!</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            <strong>Phising</strong> adalah teknik penipuan online yang bertujuan memancing korban untuk memberikan data pribadi berharga seperti password akun medsos, data keuangan, atau mengunduh virus perusak HP tanpa disadari.
+                        </p>
+                        
+                        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700/50 space-y-2">
+                            <span class="text-xs font-bold text-slate-200 block">Taktik Licik Penipu Phising:</span>
+                            <ul class="text-[11px] text-slate-300 space-y-1 list-disc list-inside">
+                                <li>Mengirim tautan (link) dengan iming-iming hadiah gratis, skin game populer, atau kuota internet sekolah gratis 100GB.</li>
+                                <li>Menyamar sebagai admin resmi sosial media, bank, atau pihak sekolah lewat pesan chat tidak resmi.</li>
+                                <li>Menakut-nakuti korban bahwa akun mereka akan dinonaktifkan dalam 24 jam jika tidak klik link tersebut.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Scam Message Mockup Right -->
+                    <div class="md:col-span-5 flex justify-center">
+                        <div class="bg-slate-950 p-4 rounded-3xl border border-slate-850 shadow-xl w-64 text-left space-y-3 animate-float relative overflow-hidden">
+                            <div class="absolute -right-6 -bottom-6 w-16 h-16 bg-rose-500/10 rounded-full blur-xl"></div>
+                            <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                                <span class="text-[8px] text-slate-500 font-mono">pesan_mencurigakan</span>
+                            </div>
+                            <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 text-[10px] space-y-2 text-slate-300">
+                                <span class="text-[8px] font-bold text-rose-400 block"><i class="fa-solid fa-triangle-exclamation"></i> SMS PENGIRIM: INDOMARET-GIFT</span>
+                                <p class="leading-tight">"Selamat! No HP Kamu terpilih memenangkan hadiah saldo gratis Rp 2.000.000 dari undian MPLS! Cairkan segera di: <strong class="text-rose-400">http://indomaret-id-gratis88.com</strong>"</p>
+                            </div>
+                            <span class="text-[8px] text-rose-400 font-mono font-bold block">🚨 AWAS: Tautan palsu & bukan alamat domain resmi!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Jangan pernah klik tautan acak yang menjanjikan hadiah fantastis!
+                </div>
+            </div>
+
+            <!-- SLIDE 21: INTERAKTIF KUIS DETEKTIF HOAKS (GAME MINI!) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="21">
+                <div class="flex justify-between items-center">
+                    <span class="bg-cyan-900/40 text-cyan-300 border border-cyan-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Ekspedisi Kuis Interaktif
+                    </span>
+                    <i class="fa-solid fa-gamepad text-amber-400"></i>
+                </div>
+
+                <div class="my-auto space-y-4">
+                    <div class="text-center space-y-1">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display">Uji Detektif Hoaks Pelajar</h2>
+                        <p class="text-xs text-slate-400">Analisis kasus di bawah ini dengan menekan tombol yang menurutmu paling tepat!</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Quiz 1 -->
+                        <div id="q-box-1" class="bg-slate-950 p-4.5 rounded-2xl border border-slate-800 text-left space-y-3">
+                            <span class="text-[9px] bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-full font-bold">SOAL 01</span>
+                            <p class="text-xs font-semibold text-slate-200">"Pesan WA berantai: Mulai besok, seluruh sekolah di kota ditutup karena cuaca ekstrem ekstrem. Diakhiri kalimat: forward pesan ini ke 10 grup kelas!"</p>
+                            <div class="flex gap-2">
+                                <button onclick="answerQuiz(1, 'hoax')" class="bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold text-[10px] px-4 py-1.5 rounded-full transition shadow-md">HOAX 🚨</button>
+                                <button onclick="answerQuiz(1, 'fakta')" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-[10px] px-4 py-1.5 rounded-full transition shadow-md">FAKTA 👍</button>
+                            </div>
+                        </div>
+
+                        <!-- Quiz 2 -->
+                        <div id="q-box-2" class="bg-slate-950 p-4.5 rounded-2xl border border-slate-800 text-left space-y-3">
+                            <span class="text-[9px] bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-full font-bold">SOAL 02</span>
+                            <p class="text-xs font-semibold text-slate-200">"Tautan dari situs resmi kementerian: kemdikbud.go.id memuat daftar beasiswa siswa berprestasi tingkat nasional tahun ajaran baru."</p>
+                            <div class="flex gap-2">
+                                <button onclick="answerQuiz(2, 'hoax')" class="bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold text-[10px] px-4 py-1.5 rounded-full transition shadow-md">HOAX 🚨</button>
+                                <button onclick="answerQuiz(2, 'fakta')" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-[10px] px-4 py-1.5 rounded-full transition shadow-md">FAKTA 👍</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Pilihlah jawabanmu dan dengarkan respons efek suaranya!
+                </div>
+            </div>
+
+            <!-- SLIDE 22: MANAJEMEN SCREEN TIME & FOMO (BARU) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="22">
+                <div class="flex justify-between items-center">
+                    <span class="bg-indigo-900/40 text-indigo-300 border border-indigo-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase font-display">
+                        Zona Kesehatan Mental
+                    </span>
+                    <i class="fa-solid fa-mobile-screen-button text-cyan-400 animate-pulse"></i>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto">
+                    <!-- Text Left -->
+                    <div class="md:col-span-7 space-y-4 text-left">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display leading-tight">
+                            Manajemen <span class="text-cyan-400">Screen Time & FOMO</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            <strong>FOMO (Fear of Missing Out)</strong> adalah perasaan takut tertinggal tren terbaru di media sosial. Hal ini sering membuat kita kecanduan menatap layar HP hingga melupakan belajar dan jam tidur yang sehat.
+                        </p>
+                        
+                        <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700/50 space-y-2 text-xs">
+                            <span class="font-bold text-slate-200 block">Siasat Keseimbangan Hidup:</span>
+                            <ul class="space-y-1.5 text-slate-400 list-disc list-inside">
+                                <li><strong>Aturan 20-20-20:</strong> Setiap 20 menit menatap layar HP, istirahatkan mata dengan melihat objek berjarak 20 kaki (6 meter) selama 20 detik.</li>
+                                <li><strong>Matikan Notifikasi Saat Belajar:</strong> Setel HP ke mode fokus atau jangan ganggu agar perhatianmu tidak terpecah.</li>
+                                <li><strong>Batas Maksimal Screen Time:</strong> Rekomendasi medis menetapkan maksimal waktu hiburan layar luar jam sekolah adalah 2 jam sehari.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Screen Time Tracker Graphic -->
+                    <div class="md:col-span-5 flex justify-center">
+                        <div class="bg-slate-950 p-5 rounded-3xl border border-slate-800 shadow-xl w-60 text-center space-y-3 animate-float">
+                            <i class="fa-solid fa-clock text-3xl text-cyan-400"></i>
+                            <h4 class="font-bold text-xs">Waktu Layar Hari Ini</h4>
+                            <div class="text-2xl font-mono text-amber-400 font-bold">01 J 45 M</div>
+                            <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full font-bold block w-max mx-auto">STATUS SEHAT</span>
+                            <p class="text-[9px] text-slate-500 leading-normal">
+                                "Istirahatkan ponselmu sejenak dan sapalah teman-teman nyata di sekelilingmu!"
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Kuasai gadgetmu, jangan biarkan gadget yang menguasai seluruh hidupmu!
+                </div>
+            </div>
+
+            <!-- SLIDE 23: GROOMING & KEAMANAN SOSIAL (PENTING & BARU) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="23">
+                <div class="flex justify-between items-center">
+                    <span class="bg-indigo-900/40 text-indigo-300 border border-indigo-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Zona Perlindungan Diri
+                    </span>
+                    <i class="fa-solid fa-user-lock text-rose-500"></i>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto">
+                    <!-- Security Warning Mockup Left -->
+                    <div class="md:col-span-5 flex justify-center">
+                        <div class="bg-slate-950 p-5 rounded-3xl border border-slate-850 shadow-xl w-64 text-left space-y-3.5 animate-float relative overflow-hidden">
+                            <div class="absolute -left-6 -top-6 w-16 h-16 bg-rose-500/10 rounded-full blur-xl"></div>
+                            <div class="w-10 h-10 bg-rose-500/20 text-rose-400 rounded-full flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-shield-cat"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-bold text-xs text-slate-200">Detektor Orang Asing</h4>
+                                <span class="text-[9px] text-rose-400 font-mono font-bold block">🚨 ALARM PERINGATAN!</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">
+                                "Profil misterius di game online memintamu mengirimkan foto selfie menggunakan seragam sekolah bergambar nama lengkapmu."
+                            </p>
+                            <span class="text-[9px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded-full font-bold block w-max">TINDAKAN: TOLAK & BLOKIR!</span>
+                        </div>
+                    </div>
+
+                    <!-- Explanatory Text Right -->
+                    <div class="md:col-span-7 space-y-4 text-left">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display leading-tight">
+                            Waspada <span class="text-rose-400">Akun Palsu & Grooming!</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Tidak semua orang di internet adalah teman baik. Banyak penjahat siber yang membuat akun profil palsu dengan foto anak sekolah tampan/cantik demi menjebak remaja SMP agar memberikan foto intim atau meminta bertemu di luar rumah.
+                        </p>
+                        
+                        <div class="bg-slate-800/80 p-4 border border-slate-700/50 rounded-xl text-xs space-y-2 text-slate-300">
+                            <strong>Aturan Ketat Keamanan Sosial:</strong>
+                            <ul class="space-y-1.5 text-slate-400 list-disc list-inside">
+                                <li>Jangan pernah setuju menemui (kopi darat) orang asing yang baru kamu kenal di internet tanpa pendampingan orang tua.</li>
+                                <li>Jangan pernah mau mengirim foto diri yang kurang sopan, sekalipun diancam atau diiming-imingi hadiah uang/pulsa.</li>
+                                <li>Jika seseorang membuatmu merasa tidak nyaman, takut, atau risih lewat obrolan online, segera ceritakan kepada Guru BK atau Orang Tuamu!</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Lindungi dirimu, internet sehat dimulai dari pertahanan diri yang cerdas!
+                </div>
+            </div>
+
+            <!-- SLIDE 24: TIMELINE HORIZONTAL 4 JURUS AMAN -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="24">
+                <div class="flex justify-between items-center">
+                    <span class="bg-emerald-900/40 text-emerald-300 border border-emerald-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase">
+                        Pilar 4: Jurus Praktis Keamanan
+                    </span>
+                    <span class="text-xs text-slate-400">Ringkasan Proteksi</span>
+                </div>
+
+                <div class="my-auto space-y-6">
+                    <div class="text-center space-y-1">
+                        <h2 class="text-2xl sm:text-3xl font-extrabold font-display">4 Jurus Tangguh Berinternet</h2>
+                        <p class="text-xs text-slate-400">Mulai kebiasaan cerdas ini hari ini demi ketenangan berselancar!</p>
+                    </div>
+
+                    <!-- Horizontal Grid Timeline -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- Step 1 -->
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 text-left space-y-2">
+                            <div class="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-xs">1</div>
+                            <h3 class="font-bold text-xs text-white">Sandi Kuat</h3>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">
+                                Buat kombinasi huruf besar, kecil, simbol, dan angka. Ubah secara rutin minimal 6 bulan sekali.
+                            </p>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 text-left space-y-2">
+                            <div class="w-8 h-8 rounded-full bg-pink-500 text-white flex items-center justify-center font-bold text-xs">2</div>
+                            <h3 class="font-bold text-xs text-white">Privasi Akun</h3>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">
+                                Kunci akun media sosialmu menjadi "Private". Hanya terima pertemanan dari orang yang kamu kenal di dunia nyata.
+                            </p>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 text-left space-y-2">
+                            <div class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs">3</div>
+                            <h3 class="font-bold text-xs text-white">Verifikasi Dua Faktor</h3>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">
+                                Aktifkan 2FA (Two-Factor Authentication) di medsosmu agar akun tidak mudah ditembus pembajak siber.
+                            </p>
+                        </div>
+                        <!-- Step 4 -->
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 text-left space-y-2">
+                            <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs">4</div>
+                            <h3 class="font-bold text-xs text-white">Wajib Keluar</h3>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">
+                                Selalu tekan tombol Logout (keluar) jika mengakses email atau medsos di laptop sekolah maupun gawai umum.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Praktikkan kebiasaan aman ini secara disiplin!
+                </div>
+            </div>
+
+            <!-- SLIDE 25: DEKLARASI NETIZEN HEBAT SMP (KOMITMEN BERSAMA) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-2xl overflow-hidden" data-slide-index="25">
+                <div class="flex justify-between items-center">
+                    <span class="bg-indigo-900/40 text-indigo-300 border border-indigo-800/60 px-3 py-1 rounded-full font-bold text-xs uppercase font-display">
+                        Komitmen Bersama
+                    </span>
+                    <i class="fa-solid fa-file-signature text-emerald-400"></i>
+                </div>
+
+                <div class="my-auto max-w-2xl mx-auto space-y-5 text-center">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold font-display text-white">Deklarasi Netizen Hebat Pelajar SMP</h2>
+                    <p class="text-xs text-slate-400">Mari suarakan komitmen digital mulia ini dalam kehidupan sehari-hari:</p>
+                    
+                    <div class="bg-slate-950 p-5 rounded-2xl border border-slate-850 space-y-3.5 text-left text-xs text-slate-200">
+                        <div class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-shield text-emerald-400 mt-0.5"></i>
+                            <span>Saya berkomitmen menjaga kerahasiaan sandi dan melidungi data pribadi saya serta keluarga.</span>
+                        </div>
+                        <div class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-heart text-pink-400 mt-0.5"></i>
+                            <span>Saya berjanji menyebarkan empati, menolak cyberbullying, dan mengabaikan ujaran kebencian online.</span>
+                        </div>
+                        <div class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-magnifying-glass text-cyan-400 mt-0.5"></i>
+                            <span>Saya akan menyaring setiap informasi secara kritis sebelum membagikannya ke media sosial.</span>
+                        </div>
+                        <div class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-graduation-cap text-amber-400 mt-0.5"></i>
+                            <span>Saya siap mengoptimalkan internet dan teknologi cerdas (AI) untuk meningkatkan prestasi akademis.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center text-xs text-slate-500">
+                    Jadilah pelopor internet ramah dan cerdas di sekolah barumu!
+                </div>
+            </div>
+
+            <!-- SLIDE 26: PENUTUP / SESI Q&A (LAST SLIDE + CONFETTI CELEBRATION) -->
+            <div class="slide-container slide-transition absolute inset-0 hidden flex flex-col justify-between p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-indigo-950 via-slate-950 to-pink-950 text-white shadow-2xl border border-white/10 overflow-hidden" data-slide-index="26">
+                <div class="absolute -right-12 -top-12 w-80 h-80 bg-pink-500/15 rounded-full blur-3xl"></div>
+                <div class="absolute -left-12 -bottom-12 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl"></div>
+
+                <div class="flex justify-between items-center z-10">
+                    <span class="bg-white/10 text-indigo-200 px-3 py-1 rounded-full font-bold text-xs uppercase">Sesi Tanya Jawab</span>
+                    <i class="fa-solid fa-circle-question text-amber-300 text-2xl animate-bounce"></i>
+                </div>
+
+                <div class="my-auto text-center space-y-6 z-10 max-w-2xl mx-auto">
+                    <div class="space-y-3">
+                        <h2 class="text-3xl sm:text-5xl font-black font-display text-white leading-tight">
+                            Siap Menjelajah<br><span class="text-pink-400">Samudra Digital?</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+                            Gunakan kekuatan internet untuk belajar, berkreasi, dan melahirkan prestasi hebat! Ada pertanyaan, rekan-rekan?
+                        </p>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3.5 items-center justify-center">
+                        <div class="bg-white/10 border border-white/15 px-5 py-2.5 rounded-full text-xs font-semibold flex items-center gap-2">
+                            🎓 <strong class="text-amber-300">MPLS 2026</strong> | SMP Digital Academy
+                        </div>
+                        <button onclick="triggerConfetti()" class="bg-gradient-to-r from-pink-500 to-amber-500 hover:from-pink-600 hover:to-amber-600 shadow-lg text-white font-bold px-6 py-2.5 rounded-full text-xs transition transform hover:scale-105 flex items-center gap-2">
+                            🚀 SELESAIKAN MISI BELAJAR <i class="fa-solid fa-circle-check"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row justify-between items-center text-[10px] text-slate-500 border-t border-slate-900 pt-3 z-10">
+                    <span>Selamat bergabung di petualangan luar biasa sekolah barumu!</span>
+                    <span>Copyright &copy; 2026 SMP Digital Academy</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER CONTROLS PANEL -->
+    <footer class="h-16 bg-slate-950 border-t border-slate-800 px-6 flex items-center justify-between z-40 shrink-0">
+        <!-- Slide Counters -->
+        <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-500 font-bold">SLIDE</span>
+            <div class="bg-slate-900 border border-slate-800 px-3 py-1 rounded-md text-white font-mono text-sm font-bold flex items-center gap-1">
+                <span id="current-slide-num">1</span>
+                <span class="text-slate-650">/</span>
+                <span>26</span>
+            </div>
+        </div>
+
+        <!-- Hotkey Guide Tip (Desktop Only) -->
+        <div class="hidden md:flex items-center gap-3 text-xs text-slate-500">
+            <span>Arah: <kbd class="bg-slate-900 text-slate-400 px-1.5 py-0.5 rounded font-mono border border-slate-800">← / →</kbd></span>
+            <span>Laser: <kbd class="bg-slate-900 text-slate-400 px-1.5 py-0.5 rounded font-mono border border-slate-800">L</kbd></span>
+            <span>Ledakan Confetti: <kbd class="bg-slate-900 text-slate-400 px-1.5 py-0.5 rounded font-mono border border-slate-800">C</kbd></span>
+            <span>Layar Penuh: <kbd class="bg-slate-900 text-slate-400 px-1.5 py-0.5 rounded font-mono border border-slate-800">F</kbd></span>
+        </div>
+
+        <!-- Pagination Arrows -->
+        <div class="flex items-center gap-2">
+            <button onclick="prevSlide()" class="w-10 h-10 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white border border-slate-800 rounded-lg transition flex items-center justify-center shadow-md" title="Slide Sebelumnya (←)">
+                <i class="fa-solid fa-chevron-left text-sm"></i>
+            </button>
+            <button onclick="nextSlide()" class="w-24 h-10 bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-600 hover:to-indigo-600 active:scale-95 text-white rounded-lg transition font-bold text-xs shadow-lg flex items-center justify-center gap-1" title="Slide Selanjutnya (→)">
+                <span>Lanjut</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE SCRIPT (Presentation Logic, state management, timer, live widgets) -->
+    <script>
+        // State variables
+        let currentSlide = 1;
+        const totalSlides = 26;
+        let laserActive = false;
+        let sidebarOpen = false;
+        let isAudioPlaying = true;
+        let timerSeconds = 0;
+        let timerInterval = null;
+
+        // Sound transition synth tone setup
+        const synth = new Tone.Synth().toDestination();
+
+        // Slide Titles for Navigation Sidebar Drawer
+        const slideTitles = [
+            "🪐 Sampul: Ekspedisi Digital",
+            "📖 Kutipan: Gerbang Belajar",
+            "🗺️ Agenda Belajar: 4 Zona",
+            "💡 Zona 1: Arti Literasi Digital",
+            "🗺️ 4 Pilar Fondasi Digital",
+            "💻 Pengantar Pilar 1: Kecakapan",
+            "🔍 Trik Pencarian Google Pro",
+            "⚖️ Membedakan Sumber Informasi",
+            "🤖 Menggunakan AI Secara Bijak",
+            "🌸 Pengantar Pilar 2: Budaya",
+            "👣 Jejak Digital Itu Abadi",
+            "💬 Sopan Santun Chatting (Netiket)",
+            "⚖️ Pengantar Pilar 3: Etika",
+            "🤝 Stop Cyberbullying!",
+            "🧩 Kuis: Kasus Bullying",
+            "🎨 Menghormati Hak Cipta Karya",
+            "🛡️ Pengantar Pilar 4: Keamanan",
+            "🔑 Melindungi Data Pribadimu",
+            "🎮 Penguji Kekuatan Sandi",
+            "🚨 Ranjau Phising & Penipuan",
+            "🎯 Kuis Interaktif Hoaks",
+            "⏰ Manajemen Screen Time",
+            "🐈 Keamanan Sosial (Grooming)",
+            "📋 4 Jurus Tangguh Berinternet",
+            "📜 Deklarasi Netizen Hebat",
+            "🚀 Selesai & Sesi Tanya Jawab"
+        ];
+
+        // INITIALIZE PRESENTATION APPLICATION
+        window.addEventListener('load', () => {
+            initPresentation();
+            startTimer();
+            buildSidebar();
+            
+            // Resume Audio Context on initial user click safely
+            document.body.addEventListener('click', () => {
+                if (Tone.context.state !== 'running') {
+                    Tone.context.resume();
+                }
+            }, { once: true });
+        });
+
+        function initPresentation() {
+            showSlide(currentSlide);
+            setupLaserPointer();
+            setupTouchGestures();
+        }
+
+        // SIDEBAR DRAWER BUILDER
+        function buildSidebar() {
+            const listContainer = document.getElementById('sidebar-slide-list');
+            listContainer.innerHTML = '';
+            
+            slideTitles.forEach((title, idx) => {
+                const button = document.createElement('button');
+                button.className = `w-full text-left p-2.5 rounded-xl transition text-[11px] font-semibold flex items-center gap-2 border border-transparent ${idx + 1 === currentSlide ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-900'}`;
+                button.setAttribute('id', `sidebar-item-${idx + 1}`);
+                button.onclick = () => {
+                    goToSlide(idx + 1);
+                    toggleSidebar();
+                };
+                button.innerHTML = `
+                    <span class="w-5 h-5 rounded-md flex items-center justify-center bg-slate-950 text-[10px] shrink-0 ${idx + 1 === currentSlide ? 'text-amber-300 font-extrabold' : ''}">${idx + 1}</span>
+                    <span class="truncate">${title}</span>
+                `;
+                listContainer.appendChild(button);
+            });
+        }
+
+        // NAVIGATE TO SLIDE
+        function showSlide(index) {
+            document.querySelectorAll('.slide-container').forEach(slide => {
+                slide.classList.add('hidden');
+                slide.classList.remove('flex');
+            });
+
+            const activeSlide = document.querySelector(`.slide-container[data-slide-index="${index}"]`);
+            if (activeSlide) {
+                activeSlide.classList.remove('hidden');
+                activeSlide.classList.add('flex');
+                
+                // Update navigation text & progress bar
+                document.getElementById('current-slide-num').innerText = index;
+                const progressPercentage = (index / totalSlides) * 100;
+                document.getElementById('progress-indicator').style.width = `${progressPercentage}%`;
+
+                // Update active sidebar elements styling
+                document.querySelectorAll('#sidebar-slide-list button').forEach((btn, idx) => {
+                    if (idx + 1 === index) {
+                        btn.className = "w-full text-left p-2.5 rounded-xl transition text-[11px] font-semibold flex items-center gap-2 border border-transparent bg-indigo-600 text-white";
+                    } else {
+                        btn.className = "w-full text-left p-2.5 rounded-xl transition text-[11px] font-semibold flex items-center gap-2 border border-transparent text-slate-400 hover:text-white hover:bg-slate-900";
+                    }
+                });
+
+                // Auto confetti at final presentation slide
+                if (index === totalSlides) {
+                    setTimeout(() => triggerConfetti(), 300);
+                }
+            }
+        }
+
+        function playTransitionSound() {
+            if (isAudioPlaying) {
+                try {
+                    // Futuristic beep sound using ToneJS Synth
+                    synth.triggerAttackRelease("E5", "24n");
+                } catch (e) {
+                    console.log("Audio feedback requires user gesture.");
+                }
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                showSlide(currentSlide);
+                playTransitionSound();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                showSlide(currentSlide);
+                playTransitionSound();
+            }
+        }
+
+        function goToSlide(num) {
+            currentSlide = num;
+            showSlide(currentSlide);
+            playTransitionSound();
+        }
+
+        // KEYBOARD HOTKEYS HANDLERS
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            } else if (e.key.toLowerCase() === 'l') {
+                toggleLaser();
+            } else if (e.key.toLowerCase() === 'c') {
+                triggerConfetti();
+            } else if (e.key.toLowerCase() === 'f') {
+                toggleFullscreen();
+            } else if (e.key.toLowerCase() === 's') {
+                toggleSidebar();
+            }
+        });
+
+        // PRESENTATION RUNNING TIMER
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                const mins = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+                const secs = (timerSeconds % 60).toString().padStart(2, '0');
+                document.getElementById('timer-display').innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function resetTimer() {
+            timerSeconds = 0;
+            document.getElementById('timer-display').innerText = "00:00";
+        }
+
+        // PRESENTER LASER POINTER LOGIC
+        function setupLaserPointer() {
+            const body = document.body;
+            const dot = document.getElementById('laser-dot');
+
+            body.addEventListener('mousemove', (e) => {
+                if (laserActive) {
+                    dot.style.left = `${e.clientX - 10}px`;
+                    dot.style.top = `${e.clientY - 10}px`;
+                }
+            });
+        }
+
+        function toggleLaser() {
+            laserActive = !laserActive;
+            const btn = document.getElementById('btn-laser');
+            const dot = document.getElementById('laser-dot');
+
+            if (laserActive) {
+                document.body.classList.add('laser-active');
+                dot.style.display = 'block';
+                btn.className = "p-1.5 text-rose-500 bg-rose-500/10 rounded-md transition border border-rose-500/20";
+            } else {
+                document.body.classList.remove('laser-active');
+                dot.style.display = 'none';
+                btn.className = "p-1.5 text-slate-400 hover:text-rose-500 rounded-md transition";
+            }
+        }
+
+        // FULLSCREEN UTILITY
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch((err) => {
+                    console.log(`Failed to trigger Fullscreen mode: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // SIDEBAR EXPANSION
+        function toggleSidebar() {
+            sidebarOpen = !sidebarOpen;
+            const drawer = document.getElementById('sidebar-drawer');
+            if (sidebarOpen) {
+                drawer.classList.remove('-translate-x-full');
+            } else {
+                drawer.classList.add('-translate-x-full');
+            }
+        }
+
+        // CELEBRATION EFFECTS
+        function triggerConfetti() {
+            confetti({
+                particleCount: 120,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
+        }
+
+        // TOGGLE SOUND
+        function togglePlayPause() {
+            isAudioPlaying = !isAudioPlaying;
+            const btn = document.getElementById('btn-play');
+            if (isAudioPlaying) {
+                btn.innerHTML = `<i class="fa-solid fa-volume-high text-emerald-400"></i>`;
+                btn.title = "Matikan Nada Transisi";
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-volume-xmark text-rose-450"></i>`;
+                btn.title = "Nyalakan Nada Transisi";
+            }
+        }
+
+        // TOUCH GESTURE SLIDE NAVIGATION
+        function setupTouchGestures() {
+            let startX = 0;
+            let endX = 0;
+            const container = document.querySelector('main');
+
+            container.addEventListener('touchstart', (e) => {
+                startX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            container.addEventListener('touchend', (e) => {
+                endX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const threshold = 60; // minimum swipe distance
+                if (startX - endX > threshold) {
+                    nextSlide(); // Swipe left -> Next
+                } else if (endX - startX > threshold) {
+                    prevSlide(); // Swipe right -> Prev
+                }
+            }
+        }
+
+        // LIVE INTERACTIVE WIDGET: PASSWORD STRENGTH TESTER LOGIC
+        function testPasswordStrength(value) {
+            const bar = document.getElementById('pwd-bar');
+            const label = document.getElementById('pwd-label');
+            const tip = document.getElementById('pwd-tip');
+            
+            if (!value) {
+                bar.style.width = "10%";
+                bar.className = "bg-rose-500 h-2 rounded-full transition-all duration-300";
+                label.innerText = "SANGAT LEMAH";
+                label.className = "font-bold text-rose-500";
+                tip.innerText = "Sandi terlalu pendek! Masukkan minimal 8 karakter.";
+                return;
+            }
+
+            let score = 0;
+            if (value.length >= 8) score += 1;
+            if (/[A-Z]/.test(value)) score += 1; // has uppercase
+            if (/[a-z]/.test(value)) score += 1; // has lowercase
+            if (/[0-9]/.test(value)) score += 1; // has numbers
+            if (/[^A-Za-z0-9]/.test(value)) score += 1; // has special char
+
+            if (score <= 1) {
+                bar.style.width = "25%";
+                bar.className = "bg-rose-500 h-2 rounded-full transition-all duration-300";
+                label.innerText = "LEMAH";
+                label.className = "font-bold text-rose-500";
+                tip.innerText = "Coba tambahkan kombinasi huruf besar dan angka.";
+            } else if (score === 2 || score === 3) {
+                bar.style.width = "55%";
+                bar.className = "bg-amber-500 h-2 rounded-full transition-all duration-300";
+                label.innerText = "SEDANG";
+                label.className = "font-bold text-amber-500";
+                tip.innerText = "Bagus! Tambahkan simbol spesial seperti @, #, $ agar lebih aman.";
+            } else if (score >= 4) {
+                bar.style.width = "100%";
+                bar.className = "bg-emerald-500 h-2 rounded-full transition-all duration-300";
+                label.innerText = "SANGAT KUAT! ⚔️";
+                label.className = "font-bold text-emerald-500";
+                tip.innerText = "Luar biasa! Sandi ini sangat tangguh dan sulit didekripsi peretas.";
+            }
+        }
+
+        // LIVE INTERACTIVE WIDGET: HOAX DETECTIVE MINI-GAME
+        function answerQuiz(id, selection) {
+            const box = document.getElementById(`q-box-${id}`);
+            
+            if (id === 1) {
+                if (selection === 'hoax') {
+                    box.className = "bg-emerald-950/40 p-4.5 rounded-2xl border-2 border-emerald-500 text-left space-y-3 transition duration-300";
+                    box.innerHTML = `
+                        <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">SOAL 01: BENAR! 🎉</span>
+                        <p class="text-xs font-semibold text-emerald-300">"Pesan berantai bernada memaksa untuk mem-forward info tanpa verifikasi resmi di web pemda adalah tanda mutlak pesan Hoaks!"</p>
+                    `;
+                    triggerSoundSuccess();
+                } else {
+                    box.className = "bg-rose-950/40 p-4.5 rounded-2xl border-2 border-rose-500 text-left space-y-3 transition duration-300";
+                    box.innerHTML = `
+                        <span class="text-[9px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded-full font-bold">SOAL 01: SALAH! ❌</span>
+                        <p class="text-xs font-semibold text-rose-300">"Jangan mudah percaya berita yang meminta disebarkan secara berantai tanpa sumber situs kredibel. Coba lagi!"</p>
+                    `;
+                    triggerSoundFail();
+                }
+            } else if (id === 2) {
+                if (selection === 'fakta') {
+                    box.className = "bg-emerald-950/40 p-4.5 rounded-2xl border-2 border-emerald-500 text-left space-y-3 transition duration-300";
+                    box.innerHTML = `
+                        <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">SOAL 02: BENAR! 🎉</span>
+                        <p class="text-xs font-semibold text-emerald-300">"Tautan berakhiran domain resmi kementerian .go.id dijamin validitasnya dan aman untuk dirujuk."</p>
+                    `;
+                    triggerSoundSuccess();
+                } else {
+                    box.className = "bg-rose-950/40 p-4.5 rounded-2xl border-2 border-rose-500 text-left space-y-3 transition duration-300";
+                    box.innerHTML = `
+                        <span class="text-[9px] bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded-full font-bold">SOAL 02: SALAH! ❌</span>
+                        <p class="text-xs font-semibold text-rose-300">"Domain situs kementerian seperti .go.id adalah saluran informasi resmi negara, otomatis valid!"</p>
+                    `;
+                    triggerSoundFail();
+                }
+            }
+        }
+
+        // CHAT CARD INTERACTION REVEAL
+        function revealBullying(id) {
+            const card = document.getElementById(`b-card-${id}`);
+            const ans = document.getElementById(`b-ans-${id}`);
+            
+            if (id === 1) {
+                card.className = "bg-rose-950/40 border-2 border-rose-500 p-4.5 rounded-2xl text-left transition duration-300 h-36 flex flex-col justify-between";
+                ans.innerHTML = `⚠️ <strong>CYBERBULLYING!</strong> Mengunggah aib/foto konyol kawan tanpa izin di grup umum melanggar etika dan berpotensi menyakiti psikologis kawan tersebut.`;
+                ans.className = "text-[9px] text-rose-400";
+            } else if (id === 2) {
+                card.className = "bg-emerald-950/40 border-2 border-emerald-500 p-4.5 rounded-2xl text-left transition duration-300 h-36 flex flex-col justify-between";
+                ans.innerHTML = `✅ <strong>BUKAN BULLYING!</strong> Menegur lewat DM privat secara sopan tanpa mempermalukan di forum umum adalah bentuk solidaritas sehat demi menjaga kawan.`;
+                ans.className = "text-[9px] text-emerald-400";
+            } else if (id === 3) {
+                card.className = "bg-rose-950/40 border-2 border-rose-500 p-4.5 rounded-2xl text-left transition duration-300 h-36 flex flex-col justify-between";
+                ans.innerHTML = `⚠️ <strong>CYBERBULLYING!</strong> Mengintimidasi atau meledek teman secara bertubi-tubi dalam game online adalah tindakan perundungan siber toxic.`;
+                ans.className = "text-[9px] text-rose-400";
+            }
+            triggerSoundSuccess();
+        }
+
+        // QUICK AUDIO EFFECTS GENERATORS
+        function triggerSoundSuccess() {
+            if (isAudioPlaying) {
+                try {
+                    const now = Tone.now();
+                    synth.triggerAttackRelease("C5", "16n", now);
+                    synth.triggerAttackRelease("E5", "16n", now + 0.1);
+                } catch(e){}
+            }
+        }
+
+        function triggerSoundFail() {
+            if (isAudioPlaying) {
+                try {
+                    const now = Tone.now();
+                    synth.triggerAttackRelease("F4", "8n", now);
+                } catch(e){}
+            }
+        }
+    </script>
+</body>
+</html>
